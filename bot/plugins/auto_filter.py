@@ -60,34 +60,30 @@ async def auto_filter(bot, update):
     filters = await db.get_filters(group_id, query)
     
     if filters:
-        results.append(
-                [
-                    InlineKeyboardButton("🔘 JOIN OUR MAIN CHANNEL 🔘", url="https://t.me/mazhatthullikal")
-                ]
-            )
         for filter in filters: # iterating through each files
             file_name = filter.get("file_name")
             file_type = filter.get("file_type")
             file_link = filter.get("file_link")
-            file_size = int(filter.get("file_size", "0"))
-            
-            # from B to MiB
+            file_size = int(filter.get("file_size", ""))
+            file_size = round((file_size/1024),2) # from B to KB
+            size = ""
+            file_KB = ""
+            file_MB = ""
+            file_GB = ""
             
             if file_size < 1024:
-                file_size = f"[{file_size} B]"
-            elif file_size < (1024**2):
-                file_size = f"[{str(round(file_size/1024, 2))} KiB] "
-            elif file_size < (1024**3):
-                file_size = f"[{str(round(file_size/(1024**2), 2))} MiB] "
-            elif file_size < (1024**4):
-                file_size = f"[{str(round(file_size/(1024**3), 2))} GiB] "
-            
-            
-            file_size = "" if file_size == ("[0 B]") else file_size
-            
-            # add emoji down below inside " " if you want..
-            button_text = f"{file_size}{file_name}"
-            
+                file_KB = f"𝚂𝚞𝚋𝚝𝚒𝚝𝚕𝚎"
+                size = file_KB
+            elif file_size < (1024*1024):
+                file_MB = f"📂 {str(round((file_size/1024),2))} 𝙼ʙ"
+                size = file_MB
+            else:
+                file_GB = f"📂 {str(round((file_size/(1024*1024)),2))} 𝙶ʙ"
+                size = file_GB
+                
+            file_names = file_name
+            file_size = size
+            print(file_name)
 
             if file_type == "video":
                 if allow_video: 
@@ -125,9 +121,9 @@ async def auto_filter(bot, update):
                 file_link = f"https://t.me/{bot_.username}?start={unique_id}"
             
             results.append([
-                InlineKeyboardButton("📂 " + file_names, url=file_link),
-                InlineKeyboardButton(f_size, url=file_link)
-        ])  
+            InlineKeyboardButton(file_names, url=file_link),
+            InlineKeyboardButton(file_size, url=file_link)
+        ])
         
     else:
         return # return if no files found for that query
@@ -289,4 +285,3 @@ async def recacher(group_id, ReCacheInvite=True, ReCacheActive=False, bot=Bot, u
             
             ACTIVE_CHATS[str(group_id)] = achatId
     return 
-
