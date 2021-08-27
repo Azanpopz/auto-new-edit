@@ -65,7 +65,6 @@ async def auto_filter(bot, update):
                     InlineKeyboardButton("🔘 JOIN OUR MAIN CHANNEL 🔘", url="https://t.me/mazhatthullikal")
                 ]
             )
-    if filters:
         for filter in filters: # iterating through each files
             file_name = filter.get("file_name")
             file_type = filter.get("file_type")
