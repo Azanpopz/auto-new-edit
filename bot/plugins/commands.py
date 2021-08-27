@@ -4,13 +4,34 @@
 
 from pyrogram import filters, Client
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from bot import Translation, LOGGER # pylint: disable=import-error
+from pyrogram.errors import UserNotParticipant
+from bot import Translation # pylint: disable=import-error
 from bot.database import Database # pylint: disable=import-error
+from bot import FORCESUB_CHANNEL
 
 db = Database()
 
 @Client.on_message(filters.command(["start"]) & filters.private, group=1)
 async def start(bot, update):
+    update_channel = FORCESUB_CHANNEL
+    if update_channel:
+        try:
+            user = await bot.get_chat_member(update_channel, update.chat.id)
+            if user.status == "kicked out":
+               await update.reply_text("🤭 Sorry Dude, You are B A N N E D 🤣🤣🤣")
+               return
+        except UserNotParticipant:
+            #await update.reply_text(f"Join @{update_channel} To Use Me")
+            await update.reply_text(
+                text="<b>🤭 HEY DUDE JOIN OUR MAIN CHANNEL TO USE ME DONT LEFT THE CHANNEL AFTER THE USE OF YOU MAY BE IT WOULD BE A MISBEHAVE TO ME🤔</b>",
+                reply_markup=InlineKeyboardMarkup([
+                    [ InlineKeyboardButton(text=" 🔻JOIN OUR CHANNEL🔺 ", url=f"https://t.me/{update_channel}")]
+              ])
+            )
+            return
+        except Exception:
+            await update.reply_text("Something Wrong. Contact my Support Group")
+            return
     
     try:
         file_uid = update.command[1]
@@ -47,12 +68,11 @@ async def start(bot, update):
         return
 
     buttons = [[
-        InlineKeyboardButton('Developers', url='https://t.me/CrazyBotsz'),
-        InlineKeyboardButton('Source Code 🧾', url ='https://github.com/CrazyBotsz/Adv-Auto-Filter-Bot-V2')
+        InlineKeyboardButton('CHANNEL', url='https://t.me/CrazyBotsz'),
+        InlineKeyboardButton('GROUP', url ='https://github.com/CrazyBotsz/Adv-Auto-Filter-Bot-V2')
     ],[
-        InlineKeyboardButton('Support 🛠', url='https://t.me/CrazyBotszGrp')
-    ],[
-        InlineKeyboardButton('Help ⚙', callback_data="help")
+        InlineKeyboardButton('HELP🧐', callback_data="help"), 
+        InlineKeyboardButton('CLOSE🔐', callback_data='close')
     ]]
     
     reply_markup = InlineKeyboardMarkup(buttons)
